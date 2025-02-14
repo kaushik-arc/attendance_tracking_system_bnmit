@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login - Geolocation Attendance</title>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        main {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .btn {
+            display: block;
+            padding: 10px;
+            margin: 15px auto;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 90%;
+            max-width: 300px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #343a40;
+            color: white;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Student Login</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>Enter your details to mark attendance</h2>
+            <form id="attendance-form">
+                <label for="name">Student Name:</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                <label for="usn">USN:</label>
+                <input type="text" id="usn" name="usn" placeholder="Enter your USN" required>
+                <button type="submit" class="btn">Mark Attendance</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Geolocation Attendance System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Geolocation setup
+        const form = document.getElementById("attendance-form");
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const usn = document.getElementById("usn").value;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        const timestamp = new Date().toISOString();
+
+                        fetch("http://localhost:3000/attendance", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ name, usn, latitude, longitude, timestamp }),
+                        })
+                            .then((response) => response.text())
+                            .then((data) => {
+                                alert("Attendance marked successfully!");
+                            })
+                            .catch((error) => {
+                                alert("Error marking attendance: " + error);
+                            });
+                    },
+                    (error) => {
+                        alert("Geolocation error: " + error.message);
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Login - Geolocation Attendance</title>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        main {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .btn {
+            display: block;
+            padding: 10px;
+            margin: 15px auto;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 90%;
+            max-width: 300px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #343a40;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Teacher Login</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>Attendance Records</h2>
+            <button class="btn" id="download">Download Attendance</button>
+
+            <table id="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>USN</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Geolocation Attendance System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Fetch attendance data from server
+        window.onload = function() {
+            fetch("http://localhost:3000/attendance")
+                .then((response) => response.json())
+                .then((data) => {
+                    const tableBody = document.getElementById("attendance-table").getElementsByTagName("tbody")[0];
+                    data.forEach((record) => {
+                        const row = tableBody.insertRow();
+                        row.innerHTML = `
+                            <td>${record.name}</td>
+                            <td>${record.usn}</td>
+                            <td>${record.latitude}</td>
+                            <td>${record.longitude}</td>
+                            <td>${record.timestamp}</td>
+                        `;
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error fetching attendance:", error);
+                });
+        };
+
+        // Download attendance data as Excel
+        document.getElementById("download").addEventListener("click", function() {
+            fetch("http://localhost:3000/attendance/download")
+                .then((response) => response.blob())
+                .then((blob) => {
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = "attendance.xlsx";
+                    link.click();
+                })
+                .catch((error) => {
+                    console.error("Error downloading attendance:", error);
+                });
+        });
+    </script>
+
+</body>
+</html>
